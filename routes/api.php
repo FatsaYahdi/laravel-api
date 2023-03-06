@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PostController;
+use App\Models\Post;
 
 // Authenticate
 Route::post('/register', [RegisterController::class , 'register']); // register
@@ -32,7 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('posts', PostController::class);
 });
-
+Route::get('/post/{postId}/views', function ($postId) {
+    $post = Post::findOrFail($postId);
+    $view = $post->views;
+    return response()->json([
+        'viewer' => $view,
+    ]);
+});
 // comment
 Route::middleware('auth:sanctum')->controller(CommentController::class)->group(function () {
     Route::get('/post/{postId}/comments', 'index');
