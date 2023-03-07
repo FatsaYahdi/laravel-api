@@ -55,11 +55,15 @@ class CommentController extends Controller
             $comment->save();
     
             return response()->json([
+                'status' => 'sukses',
                 'message' => 'Komentar telah ditambahkan.',
                 'komentar' => $comment
             ], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'gagal',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -95,11 +99,15 @@ class CommentController extends Controller
             }
 
             return response()->json([
+                'status' => 'sukses',
                 'message' => 'Komentar berhasil diperbarui.',
                 'komentar' => $comment
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'gagal',
+                'error' => $e->getMessage()
+            ], 500);
         }
 }
 
@@ -115,6 +123,7 @@ class CommentController extends Controller
         $comment = Comment::findOrFail($id);
         $comment->delete();
         return response()->json([
+            'status' => 'sukses',
             'message' => 'Komentar berhasil di hapus.',
             'komentar' => $comment
         ]);

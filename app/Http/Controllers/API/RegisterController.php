@@ -34,6 +34,7 @@ class RegisterController extends Controller
     
         if ($validator->fails()) {
             return response()->json([
+                'status' => 'gagal',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -44,6 +45,7 @@ class RegisterController extends Controller
         ]);
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
+            'status' => 'sukses',
             'message' => 'Register Successfully.',
             'user' => $user,
             'access_token' => $token,

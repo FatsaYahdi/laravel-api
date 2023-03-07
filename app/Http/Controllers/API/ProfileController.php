@@ -12,6 +12,8 @@ class ProfileController extends Controller
     public function index(Request $request) {
         $user = $request->user();
         return response()->json([
+            'status' => 'sukses',
+            'message' => 'Show Profile',
             'user' => $user
         ]);
     }
@@ -38,11 +40,14 @@ class ProfileController extends Controller
             $user->save();
 
             return response()->json([
+                'status' => 'sukses',
+                'message' => 'Data Berhasil di Update',
                 'data' => $user
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
             return response()->json([
+                'status' => 'gagal',
                 'errors' => $errors,
             ], 422);
         } 

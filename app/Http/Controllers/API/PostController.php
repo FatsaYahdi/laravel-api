@@ -51,10 +51,12 @@ class PostController extends Controller
             ]);
         } catch (ValidationException $e) {
             return response()->json([
+                'status' => 'gagal',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 'gagal',
                 'error' => 'Terjadi kesalahan',
                 'message' => $e->getMessage()
             ], 500);
@@ -71,6 +73,8 @@ class PostController extends Controller
         $post->views++;
         $post->save();
         return response()->json([
+            'status' => 'sukses',
+            'message' => 'Showing Post',
             'post' => $post
         ]);
     }
@@ -100,12 +104,14 @@ class PostController extends Controller
             $post->save();
 
             return response()->json([
+                'status' => 'sukses',
                 'message' => 'Post Berhasil Di Perbaharui.',
                 'post' => $post
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
             return response()->json([
+                'status' => 'gagal',
                 'errors' => $errors,
             ], 422);
         }
@@ -121,6 +127,7 @@ class PostController extends Controller
         $post->delete();
 
         return response()->json([
+            'status' => 'sukses',
             'message' => 'Post Berhasil Di Hapus.',
             'data' => $post
         ]);

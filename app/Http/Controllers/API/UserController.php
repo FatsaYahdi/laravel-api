@@ -13,6 +13,7 @@ class UserController extends Controller
 {
     public function index() {
         return response()->json([
+            'message' => 'Showing All User',
             'users' => User::all()
         ]);
     }
@@ -20,6 +21,7 @@ class UserController extends Controller
     public function show($id) {
         $user = User::findOrFail($id);
         return response()->json([
+            'message' => 'Showing User Profile',
             'user' => $user
         ]);
     }
@@ -52,15 +54,18 @@ class UserController extends Controller
             $user = User::create($validatedData);
 
             return response()->json([
+                'status' => 'sukses',
                 'message' => 'Data berhasil di buat.',
                 'data' => $user
             ],200);
         } catch (ValidationException $e) {
             return response()->json([
+                'status' => 'gagal',
                 'eror' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 'gagal',
                 'error' => 'Terjadi kesalahan',
                 'message' => $e->getMessage()
             ], 500);
@@ -97,10 +102,12 @@ class UserController extends Controller
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
             return response()->json([
+                'status' => 'gagal',
                 'errors' => $errors,
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 'gagal',
                 'Eror' => 'Eror'
             ], 500);
         }
@@ -110,6 +117,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
         return response()->json([
+            'status' => 'sukses',
             'message' => 'Data berhasil di hapus.',
             'data' => $user
         ]);

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PostController;
+use App\Http\Controllers\API\ResetPasswordController;
 use App\Models\Post;
 
 // Authenticate
@@ -19,6 +20,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update']); // update
     Route::post('/logout', [LoginController::class, 'logout']); // logout
 });
+
+Route::post('/password/forgot',[ResetPasswordController::class, 'token']);
+Route::post('/password/reset',[ResetPasswordController::class, 'reset']);
 
 // CRUD user
 Route::post('/users', [UserController::class, 'create']); // create

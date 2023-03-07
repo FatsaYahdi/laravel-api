@@ -4,6 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -28,6 +31,7 @@ class LoginController extends Controller
                 $token = $user->createToken('api-token')->plainTextToken;
     
                 return response()->json([
+                    'status' => 'sukses',
                     'message' => 'Berhasil Login',
                     'user' => $user,
                     'token' => $token,
@@ -38,18 +42,17 @@ class LoginController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 'gagal',
                 'message' => $e->getMessage(),
             ], 401);
         }
     }
-    
 
     public function logout(Request $request) {
         $request->user()->tokens()->delete();
         return response()->json([
+            'status' => 'sukses',
             'message' => 'Berhasil Logout.',
         ]);
     }
-    
-
 }
