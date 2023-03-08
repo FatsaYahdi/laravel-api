@@ -5,13 +5,15 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
     public function register(Request $request) {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|min:3|max:255',
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|string|min:8'
@@ -31,24 +33,37 @@ class RegisterController extends Controller
             'password.string' => 'Password Harus berupa string.',
             'password.min' => 'Password Harus 8 karakter atau lebih'
         ]);
-    
-        if ($validator->fails()) {
+        try {
+            $data = $request->all();
+            $data['password'] = Hash::make($data['password']);
+            $user = User::create($data);
+
+            if (Auth::loginUsingId($user->id)) {
+                $token = $user->createToken('api-token')->plainTextToken;
+                return response()->json([
+                    'status' => 'sukses',
+                    'message' => 'Registrasi Berhasil. Login Sukses.',
+                    'data' => $user,
+                    'token' => $token,
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'sukses',
+                    'message' => 'Registrasi Berhasil. Login Gagal',
+                    'data' => $user
+                ],200);
+            }
+        } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'gagal',
-                'errors' => $validator->errors()
+                'eror' => $e->errors()
             ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'gagal',
+                'error' => 'Terjadi kesalahan',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-        ]);
-        $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json([
-            'status' => 'sukses',
-            'message' => 'Register Successfully.',
-            'user' => $user,
-            'access_token' => $token,
-        ]);
     }
 }

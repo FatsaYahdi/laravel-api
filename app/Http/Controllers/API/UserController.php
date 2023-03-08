@@ -28,30 +28,31 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'name' => 'required|string|min:3|max:255|unique:users,name',
-                'email' => 'required|email|unique:users',
-                'password' => 'required|min:8'
-            ],[
-            // name
-            'name.required' => 'Nama Harus di isi.',
-            'name.string' => 'Nama Harus berupa string.',
-            'name.min' => 'Nama Harus memiliki 3 karakter atau lebih.',
-            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
-            'name.unique' => 'Nama sudah di pakai.',
-            
-            // email
-            'email.required' => 'Email harus di isi.',
-            'email.email' => 'Email harus berupa email.',
-            'email.unique' => 'Email sudah di pakai.',
+        $request->validate([
+            'name' => 'required|string|min:3|max:255|unique:users,name',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8'
+        ],[
+        // name
+        'name.required' => 'Nama Harus di isi.',
+        'name.string' => 'Nama Harus berupa string.',
+        'name.min' => 'Nama Harus memiliki 3 karakter atau lebih.',
+        'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+        'name.unique' => 'Nama sudah di pakai.',
+        
+        // email
+        'email.required' => 'Email harus di isi.',
+        'email.email' => 'Email harus berupa email.',
+        'email.unique' => 'Email sudah di pakai.',
 
-            // password
-            'password.required' => 'Password harus di isi.',
-            'password.min' => 'Password harus memiliki panjang 8 atau lebih.'
-            ]);
-            $validatedData['password'] = Hash::make($validatedData['password']);
-            $user = User::create($validatedData);
+        // password
+        'password.required' => 'Password harus di isi.',
+        'password.min' => 'Password harus memiliki panjang 8 atau lebih.'
+        ]);
+        try {
+            $data = $request->all();
+            $data['password'] = Hash::make($data['password']);
+            $user = User::create($data);
 
             return response()->json([
                 'status' => 'sukses',

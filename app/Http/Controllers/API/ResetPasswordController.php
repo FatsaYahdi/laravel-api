@@ -24,11 +24,12 @@ class ResetPasswordController extends Controller
         $status = Password::sendResetLink($request->only('email'));
         if ($status == Password::RESET_LINK_SENT) {
             return response()->json([
-                'status' => __($status)
+                'status' => 'sukses',
+                'message' => 'Token telah di kirim ke email anda.'
             ]);
         }
         throw ValidationException::withMessages([
-            'email' => [trans($status)]
+            'email' => 'Tidak bisa menemukan user dengan email tersebut.'
         ]);
     }
     public function reset(Request $request)
@@ -60,6 +61,11 @@ class ResetPasswordController extends Controller
                 'status' => 'sukses',
                 'message' => 'Password Berhasil Di Update.'
             ]);
+        } else if ($status == Password::INVALID_TOKEN) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => 'Token reset password tidak valid atau kadaluarsa.'
+            ], 422);
         }
         return response()->json([
             'status' => 'gagal',
