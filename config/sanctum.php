@@ -62,4 +62,7 @@ return [
         'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
     ],
 
+    'pagination' => [
+        'default_per_page' => 10,
+    ],
 ];

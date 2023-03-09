@@ -16,10 +16,25 @@ class CommentController extends Controller
      */
     public function index($postId)
     {
-        $comments = Comment::where('post_id',$postId)->get();
-        return response()->json([
-            'Komentar' => $comments
-        ]);
+        $comments = Comment::where('post_id', $postId)->paginate(10);
+        $data = $comments->items();
+        $nextPageUrl = $comments->nextPageUrl();
+        $prevPageUrl = $comments->previousPageUrl();
+
+        $response = [
+            'message' => 'Menampilkan Semua Pengguna',
+            'data' => $data
+        ];
+
+        if (!is_null($nextPageUrl)) {
+            $response['selanjutnya'] = $nextPageUrl;
+        }
+
+        if (!is_null($prevPageUrl)) {
+            $response['sebelumnya'] = $prevPageUrl;
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -30,6 +45,7 @@ class CommentController extends Controller
      */
     public function store(Request $request, $postId)
     {
+        $this->authorize('create', Comment::class);
         try {
             $user = auth()->user();
     
@@ -76,6 +92,7 @@ class CommentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->authorize('update', $id);
         try {
             $comment = Comment::findOrFail($id);
 

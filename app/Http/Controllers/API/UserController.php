@@ -11,17 +11,34 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-    public function index() {
-        return response()->json([
-            'message' => 'Showing All User',
-            'users' => User::all()
-        ]);
+    public function index()
+    {
+        $users = User::paginate(10);
+        $usersData = $users->items();
+        $nextPageUrl = $users->nextPageUrl();
+        $prevPageUrl = $users->previousPageUrl();
+
+        $response = [
+            'message' => 'Menampilkan Semua Pengguna',
+            'users' => $usersData
+        ];
+
+        if (!is_null($nextPageUrl)) {
+            $response['selanjutnya'] = $nextPageUrl;
+        }
+
+        if (!is_null($prevPageUrl)) {
+            $response['sebelumnya'] = $prevPageUrl;
+        }
+
+        return response()->json($response);
     }
 
     public function show($id) {
         $user = User::findOrFail($id);
         return response()->json([
-            'message' => 'Showing User Profile',
+            'status' => 'sukses',
+            'message' => 'Menampilkan Profile Pengguna',
             'user' => $user
         ]);
     }
@@ -98,6 +115,8 @@ class UserController extends Controller
             $user->save();
 
             return response()->json([
+                'status' => 'sukses',
+                'message' => 'Data berhasil di update',
                 'data' => $user
             ]);
         } catch (ValidationException $e) {

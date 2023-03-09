@@ -13,23 +13,23 @@ class LoginController extends Controller
     public function login(Request $request) {
         try {
             $credential = $request->only('email','password');
-            
+
             if (empty($credential['email']) && empty($credential['password'])) {
-                throw new \Exception('Email and Password fields are required.');
+                throw new \Exception('Email dan Password harus di isi.');
             }
-            
+
             if (empty($credential['email'])) {
-                throw new \Exception('Email field is required.');
+                throw new \Exception('Email harus di isi.');
             }
-            
+
             if (empty($credential['password'])) {
-                throw new \Exception('Password field is required.');
+                throw new \Exception('Password harus di isi.');
             }
-            
+
             if(auth()->attempt($credential)) {
                 $user = $request->user();
                 $token = $user->createToken('api-token')->plainTextToken;
-    
+
                 return response()->json([
                     'status' => 'sukses',
                     'message' => 'Berhasil Login',
@@ -38,7 +38,6 @@ class LoginController extends Controller
                 ]);
             } else {
                 throw new \Exception("Invalid Credentials.");
-                
             }
         } catch (\Exception $e) {
             return response()->json([

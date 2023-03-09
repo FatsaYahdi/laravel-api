@@ -12,7 +12,7 @@ use App\Models\Post;
 
 // Authenticate
 Route::post('/register', [RegisterController::class , 'register']); // register
-Route::post('/login', [LoginController::class, 'login']); // login
+Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login'); // login
 
 // view & update profile
 Route::middleware('auth:sanctum')->group(function () {
@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']); // logout
 });
 
-Route::post('/password/forgot',[ResetPasswordController::class, 'token']);
+Route::post('/password/forgot',[ResetPasswordController::class, 'token'])->middleware('throttle:reset');
 Route::post('/password/reset',[ResetPasswordController::class, 'reset']);
 
 // CRUD user
@@ -34,20 +34,20 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // CRUD Post
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('posts', PostController::class);
+Route::prefix('posts')->controller(PostController::class)->group(function() {
+    Route::get('/','index');
+    Route::post('/','store')->middleware('auth:sanctum');
+    Route::get('/{post}','show');
+    Route::put('/{post}','update')->middleware('auth:sanctum');
+    Route::delete('/{post}','destroy')->middleware('auth:sanctum');
+
+    Route::get('/post/{postId}/views','views');
 });
-Route::get('/post/{postId}/views', function ($postId) {
-    $post = Post::findOrFail($postId);
-    $view = $post->views;
-    return response()->json([
-        'viewer' => $view,
-    ]);
-});
+
 // comment
-Route::middleware('auth:sanctum')->controller(CommentController::class)->group(function () {
+Route::controller(CommentController::class)->group(function () {
     Route::get('/post/{postId}/comments', 'index');
-    Route::post('/post/{postId}/comments', 'store');
-    Route::put('/comment/{id}', 'update');
-    Route::delete('/comment/{id}', 'destroy');
+    Route::post('/post/{postId}/comments', 'store')->middleware('auth:sanctum');
+    Route::put('/comment/{id}', 'update')->middleware('auth:sanctum');
+    Route::delete('/comment/{id}', 'destroy')->middleware('auth:sanctum');
 });

@@ -17,10 +17,26 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
-        return response()->json([
-            'posts' => $posts,
-        ]);
+        $posts = Post::paginate(10);
+        $postsData = $posts->items();
+        $nextPageUrl = $posts->nextPageUrl();
+        $prevPageUrl = $posts->previousPageUrl();
+
+        $response = [
+            'status' => 'sukses',
+            'message' => 'Menampilkan Semua Postingan',
+            'posts' => $postsData
+        ];
+
+        if (!is_null($nextPageUrl)) {
+            $response['selanjutnya'] = $nextPageUrl;
+        }
+
+        if (!is_null($prevPageUrl)) {
+            $response['sebelumnya'] = $prevPageUrl;
+        }
+
+        return response()->json($response);
     }
 
     /*
@@ -130,6 +146,14 @@ class PostController extends Controller
             'status' => 'sukses',
             'message' => 'Post Berhasil Di Hapus.',
             'data' => $post
+        ]);
+    }
+
+    public function views($postId) {
+        $post = Post::findOrFail($postId);
+        $view = $post->views;
+        return response()->json([
+            'viewer' => $view,
         ]);
     }
 }
