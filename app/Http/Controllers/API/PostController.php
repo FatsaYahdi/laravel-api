@@ -60,10 +60,9 @@ class PostController extends Controller
                 'content.string' => 'Content harus berupa string.',
                 'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
             ]);
-            $post = Post::create(array_merge($validatedData, ['user_id' => auth()->user()->id]));
+            Post::create(array_merge($validatedData, ['user_id' => auth()->user()->id]));
             return response()->json([
                 'message' => 'Post Berhasil Di Buat.',
-                'post' => $post
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -122,7 +121,6 @@ class PostController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Post Berhasil Di Perbaharui.',
-                'post' => $post
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
@@ -145,7 +143,6 @@ class PostController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Post Berhasil Di Hapus.',
-            'data' => $post
         ]);
     }
 

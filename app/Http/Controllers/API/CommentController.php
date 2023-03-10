@@ -22,7 +22,8 @@ class CommentController extends Controller
         $prevPageUrl = $comments->previousPageUrl();
 
         $response = [
-            'message' => 'Menampilkan Semua Pengguna',
+            'status' => 'sukses',
+            'message' => 'Menampilkan Semua Komentar',
             'data' => $data
         ];
 
@@ -73,7 +74,6 @@ class CommentController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Komentar telah ditambahkan.',
-                'komentar' => $comment
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -92,7 +92,7 @@ class CommentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorize('update', $id);
+        // $this->authorize('update', $id);
         try {
             $comment = Comment::findOrFail($id);
 
@@ -118,7 +118,6 @@ class CommentController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Komentar berhasil diperbarui.',
-                'komentar' => $comment
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -142,7 +141,6 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Komentar berhasil di hapus.',
-            'komentar' => $comment
         ]);
     }
 }

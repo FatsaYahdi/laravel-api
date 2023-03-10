@@ -14,7 +14,7 @@ class ProfileController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Show Profile',
-            'user' => $user
+            'data' => $user
         ]);
     }
 
@@ -42,7 +42,6 @@ class ProfileController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Data Berhasil di Update',
-                'data' => $user
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();

@@ -33,7 +33,6 @@ class LoginController extends Controller
                 return response()->json([
                     'status' => 'sukses',
                     'message' => 'Berhasil Login',
-                    'user' => $user,
                     'token' => $token,
                 ]);
             } else {

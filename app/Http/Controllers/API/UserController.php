@@ -20,7 +20,7 @@ class UserController extends Controller
 
         $response = [
             'message' => 'Menampilkan Semua Pengguna',
-            'users' => $usersData
+            'data' => $usersData
         ];
 
         if (!is_null($nextPageUrl)) {
@@ -39,7 +39,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Menampilkan Profile Pengguna',
-            'user' => $user
+            'data' => $user
         ]);
     }
 
@@ -69,12 +69,11 @@ class UserController extends Controller
         try {
             $data = $request->all();
             $data['password'] = Hash::make($data['password']);
-            $user = User::create($data);
+            User::create($data);
 
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Data berhasil di buat.',
-                'data' => $user
             ],200);
         } catch (ValidationException $e) {
             return response()->json([
@@ -117,7 +116,6 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Data berhasil di update',
-                'data' => $user
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
@@ -138,8 +136,7 @@ class UserController extends Controller
         $user->delete();
         return response()->json([
             'status' => 'sukses',
-            'message' => 'Data berhasil di hapus.',
-            'data' => $user
+            'message' => 'User berhasil di hapus.',
         ]);
     }
 }

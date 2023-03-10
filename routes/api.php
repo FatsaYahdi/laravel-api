@@ -10,6 +10,7 @@ use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\ResetPasswordController;
 use App\Models\Post;
 
+Route::prefix('v1')->group(function () {
 // Authenticate
 Route::post('/register', [RegisterController::class , 'register']); // register
 Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login'); // login
@@ -50,4 +51,9 @@ Route::controller(CommentController::class)->group(function () {
     Route::post('/post/{postId}/comments', 'store')->middleware('auth:sanctum');
     Route::put('/comment/{id}', 'update')->middleware('auth:sanctum');
     Route::delete('/comment/{id}', 'destroy')->middleware('auth:sanctum');
+});
+
+});
+Route::prefix('v2')->group(function () {
+    
 });

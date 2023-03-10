@@ -43,14 +43,12 @@ class RegisterController extends Controller
                 return response()->json([
                     'status' => 'sukses',
                     'message' => 'Registrasi Berhasil. Login Sukses.',
-                    'data' => $user,
                     'token' => $token,
                 ]);
             } else {
                 return response()->json([
                     'status' => 'sukses',
                     'message' => 'Registrasi Berhasil. Login Gagal',
-                    'data' => $user
                 ],200);
             }
         } catch (ValidationException $e) {
