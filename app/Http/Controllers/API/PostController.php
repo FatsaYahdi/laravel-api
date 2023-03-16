@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Like;
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -46,22 +48,25 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'title' => 'required|string|min:3|unique:posts,title',
-                'content' => 'required|string|max:255'
-            ],[
-                'title.required' => 'Title harus di isi.',
-                'title.string' => 'Title harus berupa string.',
-                'title.min' => 'Title harus memiliki 3 karakter atau lebih.',
-                'title.unique' => 'Title Sudah di pakai.',
+        $validatedData = $request->validate([
+            'title' => 'required|string|min:3|unique:posts,title',
+            'content' => 'required|string|max:255'
+        ],[
+            'title.required' => 'Title harus di isi.',
+            'title.string' => 'Title harus berupa string.',
+            'title.min' => 'Title harus memiliki 3 karakter atau lebih.',
+            'title.unique' => 'Title Sudah di pakai.',
 
-                'content.required' => 'Content harus di isi.',
-                'content.string' => 'Content harus berupa string.',
-                'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
-            ]);
-            Post::create(array_merge($validatedData, ['user_id' => auth()->user()->id]));
+            'content.required' => 'Content harus di isi.',
+            'content.string' => 'Content harus berupa string.',
+            'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
+        ]);
+        try {
+            $post = Post::create(array_merge($validatedData, ['user_id' => auth()->user()->id]));
+            $tag = $request->input('tag_id');
+            $post->tags()->attach($tag);
             return response()->json([
+                'status' => 'sukses',
                 'message' => 'Post Berhasil Di Buat.',
             ]);
         } catch (ValidationException $e) {
@@ -87,10 +92,11 @@ class PostController extends Controller
     {
         $post->views++;
         $post->save();
+        $posts = Post::with('tags')->find($post->id);
         return response()->json([
             'status' => 'sukses',
             'message' => 'Showing Post',
-            'post' => $post
+            'post' => $posts
         ]);
     }
 
@@ -99,24 +105,27 @@ class PostController extends Controller
      *
      *
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $post)
     {
+        $validatedData = $request->validate([
+            'title' => 'nullable|string|min:3',
+            'content' => 'nullable|string|max:255'
+        ],[
+            'title.string' => 'Title harus berupa string.',
+            'title.min' => 'Title harus lebih dari 3 karakter atau lebih.',
+
+            'content.string' => 'Content harus berupa string.',
+            'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
+        ]);
         try {
-            $validatedData = $request->validate([
-                'title' => 'nullable|string|min:3',
-                'content' => 'nullable|string|max:255'
-            ],[
-                'title.string' => 'Title harus berupa string.',
-                'title.min' => 'Title harus lebih dari 3 karakter atau lebih.',
+            $posts = Post::findOrFail($post);
+            $posts->title = $validatedData['title'] ?? $posts->title;
+            $posts->content = $validatedData['content'] ?? $posts->content;
+            $posts->user_id = $request->user()->id;
+            $posts->save();
 
-                'content.string' => 'Content harus berupa string.',
-                'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
-            ]);
-
-            $post->title = $validatedData['title'] ?? $post->title;
-            $post->content = $validatedData['content'] ?? $post->content;
-            $post->user_id = $request->user()->id;
-            $post->save();
+            $tagId = $request->input('tag_id');
+            $posts->tags()->sync($tagId);
 
             return response()->json([
                 'status' => 'sukses',
@@ -136,14 +145,16 @@ class PostController extends Controller
      *
      *
      */
-    public function destroy(Post $post)
+    public function destroy($post)
     {
-        $post->delete();
+        $posts = Post::findOrFail($post);
+        $posts->tags()->detach();
+        $posts->delete();
 
         return response()->json([
             'status' => 'sukses',
             'message' => 'Post Berhasil Di Hapus.',
-        ]);
+        ],204);
     }
 
     public function views($postId) {

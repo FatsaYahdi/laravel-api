@@ -48,6 +48,18 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Post::class);
     }
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 
     public function sendPasswordResetNotification($token)
     {

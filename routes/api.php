@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\CommentController;
+use App\Http\Controllers\API\LikeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\ProfileController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PostController;
 use App\Http\Controllers\API\ResetPasswordController;
+use App\Http\Controllers\API\TagController;
+use App\Http\Controllers\BookmarkController;
 use App\Models\Post;
 
 Route::prefix('v1')->group(function () {
@@ -55,5 +58,28 @@ Route::controller(CommentController::class)->group(function () {
 
 });
 Route::prefix('v2')->group(function () {
-    
+    // tag
+   Route::controller(TagController::class)->prefix('tag')->group(function () {
+    Route::get('/','index')->middleware('auth:sanctum');
+    Route::post('/create','store')->middleware('auth:sanctum');
+    Route::put('/update/{tag}','update')->middleware('auth:sanctum');
+    Route::delete('/delete/{tag}','destroy')->middleware('auth:sanctum');
+   });
+    // like
+   Route::controller(LikeController::class)->group(function () {
+    Route::post('/like/{post}','like')->middleware('auth:sanctum');
+   });
+    // saved
+    Route::controller(BookmarkController::class)->prefix('saved')->group(function () {
+        Route::get('/','index')->middleware('auth:sanctum');
+        Route::post('/{id}/save','store')->middleware('auth:sanctum');
+    });
+    // post tag
+    Route::controller(PostController::class)->prefix('posts')->middleware('auth:sanctum')->group(function () {
+        Route::get('/','index');
+        Route::post('/','store');
+        Route::get('/{post}','show');
+        Route::put('/{post}','update');
+        Route::delete('/{post}','destroy');
+    });
 });

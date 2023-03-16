@@ -51,4 +51,16 @@ class Post extends Model
             get: fn ($value) => Carbon::parse($value)->translatedFormat('d F Y'),
         );
     }
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
 }
