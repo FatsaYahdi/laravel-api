@@ -28,10 +28,12 @@ class LoginController extends Controller
 
             if(auth()->attempt($credential)) {
                 $user = $request->user();
+                $id = $user->id;
                 $token = $user->createToken('api-token')->plainTextToken;
 
                 return response()->json([
                     'status' => 'sukses',
+                    'id' => $id,
                     'message' => 'Berhasil Login',
                     'token' => $token,
                 ]);

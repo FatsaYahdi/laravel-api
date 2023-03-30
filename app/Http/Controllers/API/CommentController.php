@@ -16,7 +16,7 @@ class CommentController extends Controller
      */
     public function index($postId)
     {
-        $comments = Comment::where('post_id', $postId)->paginate(10);
+        $comments = Comment::where('post_id', $postId)->with('user:id,name')->paginate(10);
         $data = $comments->items();
         $nextPageUrl = $comments->nextPageUrl();
         $prevPageUrl = $comments->previousPageUrl();

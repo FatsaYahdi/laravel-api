@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\Tag;
@@ -50,7 +51,8 @@ class PostController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|string|min:3|unique:posts,title',
-            'content' => 'required|string|max:255'
+            'content' => 'required|string|max:255',
+            'image' => 'image|nullable'
         ],[
             'title.required' => 'Title harus di isi.',
             'title.string' => 'Title harus berupa string.',
@@ -62,7 +64,13 @@ class PostController extends Controller
             'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
         ]);
         try {
-            $post = Post::create(array_merge($validatedData, ['user_id' => auth()->user()->id]));
+            $data = $validatedData;
+            if($request->file('image')) {
+                $fileName = $request->file('image')->getClientOriginalName();
+                $request->file('image')->storeAs('public/images/posts', $fileName);
+                $data['image'] = $fileName;
+            }
+            $post = Post::create(array_merge($data, ['user_id' => auth()->user()->id]));
             $tag = $request->input('tag_id');
             $post->tags()->attach($tag);
             return response()->json([
@@ -90,13 +98,15 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $comments = Comment::where('post_id', $post->id)->with('user:id,name')->get();
+        $posts = Post::with('tags:id,name')->with('user:id,name')->find($post->id);
         $post->views++;
         $post->save();
-        $posts = Post::with('tags')->find($post->id);
         return response()->json([
             'status' => 'sukses',
             'message' => 'Showing Post',
-            'post' => $posts
+            'post' => $posts,
+            'comment' => $comments
         ]);
     }
 

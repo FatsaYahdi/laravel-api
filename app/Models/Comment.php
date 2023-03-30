@@ -13,13 +13,20 @@ class Comment extends Model
         'user_id',
         'post_id',
     ];
+    protected $hidden = [
+        'updated_at',
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function post()
+    public function posts()
     {
         return $this->belongsTo(Post::class);
     }
+    protected $casts = [
+        'created_at' => 'datetime:d F Y',
+        'updated_at' => 'datetime:d F Y'
+    ];
 }

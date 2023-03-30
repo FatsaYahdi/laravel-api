@@ -14,7 +14,8 @@ class Post extends Model
     protected $fillable = [
         'title',
         'content',
-        'user_id'
+        'user_id',
+        'image',
     ];
     protected $hidden = [
         'created_at', 
@@ -62,5 +63,9 @@ class Post extends Model
     public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

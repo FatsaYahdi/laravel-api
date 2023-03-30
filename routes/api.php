@@ -55,8 +55,8 @@ Route::controller(CommentController::class)->group(function () {
     Route::put('/comment/{id}', 'update')->middleware('auth:sanctum');
     Route::delete('/comment/{id}', 'destroy')->middleware('auth:sanctum');
 });
-
 });
+Route::post('/login', [LoginController::class, 'login']);
 Route::prefix('v2')->group(function () {
     // tag
    Route::controller(TagController::class)->prefix('tag')->group(function () {
