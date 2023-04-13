@@ -16,24 +16,12 @@ class CommentController extends Controller
      */
     public function index($postId)
     {
-        $comments = Comment::where('post_id', $postId)->with('user:id,name')->paginate(10);
-        $data = $comments->items();
-        $nextPageUrl = $comments->nextPageUrl();
-        $prevPageUrl = $comments->previousPageUrl();
-
+        $data = Comment::whereNull('parent_id')->where('post_id', $postId)->with('user:id,name')->with('replies.user:id,name')->with('replies.replies')->with('replies.replies.user:id,name')->get();
         $response = [
             'status' => 'sukses',
             'message' => 'Menampilkan Semua Komentar',
             'data' => $data
         ];
-
-        if (!is_null($nextPageUrl)) {
-            $response['selanjutnya'] = $nextPageUrl;
-        }
-
-        if (!is_null($prevPageUrl)) {
-            $response['sebelumnya'] = $prevPageUrl;
-        }
 
         return response()->json($response);
     }
@@ -49,31 +37,28 @@ class CommentController extends Controller
         $this->authorize('create', Comment::class);
         try {
             $user = auth()->user();
-    
-            $validator = Validator::make($request->all(), [
+            $request->validate([
                 'text' => 'required|string|min:3|max:255',
+                'parent_id' => 'nullable|exists:comments,id',
             ],[
                 'text.required' => 'Text harus di isi.',
                 'text.string' => 'Text harus berupa string.',
                 'text.min' => 'Text harus memiliki 3 karakter atau lebih.',
                 'text.max' => 'Text harus harus kurang dari 255.',
             ]);
-    
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 400);
-            }
-    
-            $comment = new Comment([
+            $parent = $request->input('parent_id');
+            $data = Comment::create([
                 'text' => $request->input('text'),
                 'user_id' => $user->id,
                 'post_id' => $postId,
+                'created_by' => auth()->user()->name,
+                'parent_id' => $parent
             ]);
-    
-            $comment->save();
-    
+
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Komentar telah ditambahkan.',
+                'data' => $data
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -141,6 +126,16 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Komentar berhasil di hapus.',
+        ]);
+    }
+
+    public function show($id)
+    {
+        $comment = Comment::where('id',$id)->where('parent_id', null)->get();
+        return response()->json([
+            'status' => 'sukses',
+            'message' => 'Menampilkan Komentar Dengan Id',
+            'data' => $comment
         ]);
     }
 }

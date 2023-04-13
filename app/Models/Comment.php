@@ -12,6 +12,8 @@ class Comment extends Model
         'text',
         'user_id',
         'post_id',
+        'parent_id',
+        'created_by'
     ];
     protected $hidden = [
         'updated_at',
@@ -29,4 +31,8 @@ class Comment extends Model
         'created_at' => 'datetime:d F Y',
         'updated_at' => 'datetime:d F Y'
     ];
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
+    }
 }

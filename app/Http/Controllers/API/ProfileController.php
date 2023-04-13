@@ -19,10 +19,7 @@ class ProfileController extends Controller
     }
 
     public function update(Request $request) {
-        try {
-            $user = $request->user();
-
-            $validatedData = $request->validate([
+        $validatedData = $request->validate([
                 'name' => 'nullable|string|min:3|max:255',
                 'email' => 'nullable|string|email',
             ],[
@@ -33,7 +30,9 @@ class ProfileController extends Controller
                 // email
                 'email.string' => 'Email Harus berupa String.',
                 'email.email' => 'Email Harus berupa email valid.',
-            ]);
+        ]);
+        try {
+            $user = $request->user();
 
             $user->name = $validatedData['name'] ?? $user->name;
             $user->email = $validatedData['email'] ?? $user->email;
@@ -44,7 +43,7 @@ class ProfileController extends Controller
                 'message' => 'Data Berhasil di Update',
             ]);
         } catch (ValidationException $e) {
-            $errors = $e->validator->errors()->getMessages();
+            $errors = $e->validator->errors()->first();
             return response()->json([
                 'status' => 'gagal',
                 'errors' => $errors,

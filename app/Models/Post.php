@@ -28,24 +28,14 @@ class Post extends Model
     ];
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
-    /**
-     * Interact with the user's first name.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
-     */
     protected function createAt(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => Carbon::parse($value)->translatedFormat('d F Y'),
         );
     }
-    /**
-     * Interact with the user's first name.
-     *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
-     */
     protected function updateAt(): Attribute
     {
         return Attribute::make(
@@ -66,6 +56,6 @@ class Post extends Model
     }
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->whereNull('parent_id');
     }
 }

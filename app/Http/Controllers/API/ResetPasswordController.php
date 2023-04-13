@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password as RulesPassword;
+use Illuminate\Support\Facades\Validator;
+
 
 class ResetPasswordController extends Controller
 {
@@ -34,16 +36,24 @@ class ResetPasswordController extends Controller
     }
     public function reset(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required',
-        ],[
+        ], [
             'token.required' => 'Token harus di isi.',
             'email.required' => 'Email harus di isi.',
             'email.email' => 'Email harus berupa valid email.',
             'password.required' => 'Password harus di isi.'
         ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return response()->json([
+            'status' => 'gagal',
+                'message' => $errors->first()
+            ], 422);
+        }
 
         $status = Password::reset(
             $request->only('email','password','token'),
@@ -69,7 +79,7 @@ class ResetPasswordController extends Controller
         }
         return response()->json([
             'status' => 'gagal',
-            'message' => __($status)
+            'message' => "Kami tidak bisa menemukan user tersebut"
         ],500);
     }
 }

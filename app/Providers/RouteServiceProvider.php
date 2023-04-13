@@ -73,11 +73,11 @@ class RouteServiceProvider extends ServiceProvider
             });
         });
         RateLimiter::for('reset', function (Request $request) {
-            return Limit::perMinute(1)->by($request->user()?->id ?: $request->ip())->response(function () {
+            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip())->response(function () {
                 return response([
                     'status' => 'gagal',
                     'message' => 'Anda Telah mencapai akses limit mengirim email. Coba lagi dalam 1 menit.'
-                ]);
+                ],400);
             });
         });
     }

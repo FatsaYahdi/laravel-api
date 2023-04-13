@@ -34,7 +34,6 @@ class User extends Authenticatable
         'remember_token',
         'email_verified_at'
     ];
-
     /**
      * The attributes that should be cast.
      *
@@ -42,6 +41,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'created_at' => 'datetime:d F Y',
+        'updated_at' => 'datetime:d F Y',
     ];
 
     public function posts()

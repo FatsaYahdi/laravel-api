@@ -40,10 +40,11 @@ Route::middleware('auth:sanctum')->group(function () {
 // CRUD Post
 Route::prefix('posts')->controller(PostController::class)->group(function() {
     Route::get('/','index');
+    Route::get('/list','list')->middleware('auth:sanctum');
     Route::post('/','store')->middleware('auth:sanctum');
     Route::get('/{post}','show');
-    Route::put('/{post}','update')->middleware('auth:sanctum');
-    Route::delete('/{post}','destroy')->middleware('auth:sanctum');
+    Route::post('/{post}/edit','update')->middleware('auth:sanctum');
+    Route::delete('/{post}/delete','destroy')->middleware('auth:sanctum');
 
     Route::get('/post/{postId}/views','views');
 });
@@ -82,4 +83,7 @@ Route::prefix('v2')->group(function () {
         Route::put('/{post}','update');
         Route::delete('/{post}','destroy');
     });
+    Route::get('/posts/tag/{id}',[PostController::class, 'taglist']);
+    Route::get('/tags',[TagController::class, 'list'])->middleware('auth:sanctum');
+    Route::get('/post/{id}/comments',[CommentController::class, 'show']);
 });

@@ -11,24 +11,13 @@ class TagController extends Controller
 {
     public function index()
     {
-        $tags = Tag::paginate(10);
-        $tagsData = $tags->items();
-        $nextPageUrl = $tags->nextPageUrl();
-        $prevPageUrl = $tags->previousPageUrl();
+        $tags = Tag::all();
 
         $response = [
             'status' => 'sukses',
             'message' => 'Menampilkan Semua Tag',
-            'posts' => $tagsData
+            'data' => $tags
         ];
-
-        if (!is_null($nextPageUrl)) {
-            $response['selanjutnya'] = $nextPageUrl;
-        }
-
-        if (!is_null($prevPageUrl)) {
-            $response['sebelumnya'] = $prevPageUrl;
-        }
 
         return response()->json($response);
     }
@@ -47,10 +36,11 @@ class TagController extends Controller
         ]);
         
         try {
-            Tag::create(array_merge($validatedData, ['created_by' => auth()->user()->name]));
+            $tag = Tag::create(array_merge($validatedData, ['created_by' => auth()->user()->name]));
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Tag Berhasil Di buat',
+                'data' => $tag
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -85,6 +75,7 @@ class TagController extends Controller
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Post Berhasil Di Perbaharui.',
+                'data' => $tag
             ]);
         } catch (ValidationException $e) {
             $errors = $e->validator->errors()->getMessages();
@@ -107,6 +98,14 @@ class TagController extends Controller
         return response()->json([
             'status' => 'sukses',
             'message' => 'Post Berhasil Di Hapus.',
+        ]);
+    }
+    public function list() {
+        $tags = Tag::where('created_by', auth()->user()->name)->get();
+        return response()->json([
+            'status' => 'sukses',
+            'message' => 'Menampilkan Tag Yang Di Buat',
+            'data' => $tags,
         ]);
     }
 }
