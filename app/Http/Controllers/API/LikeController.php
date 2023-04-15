@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class LikeController extends Controller
 {
-    public function like(Request $request, $post)
+    public function like($post)
     {
         $like = Like::where('post_id', $post)->where('user_id', auth()->user()->id)->first();
         if ($like) {

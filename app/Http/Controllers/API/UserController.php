@@ -48,7 +48,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|min:3|max:255|unique:users,name',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8'
+            'password' => 'required|min:8|confirmed'
         ],[
         // name
         'name.required' => 'Nama Harus di isi.',
@@ -64,7 +64,8 @@ class UserController extends Controller
 
         // password
         'password.required' => 'Password harus di isi.',
-        'password.min' => 'Password harus memiliki panjang 8 atau lebih.'
+        'password.min' => 'Password harus memiliki panjang 8 atau lebih.',
+        'password.confirmed' => 'Password tidak sama.',
         ]);
         try {
             $data = $request->all();

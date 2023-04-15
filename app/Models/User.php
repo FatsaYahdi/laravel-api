@@ -57,6 +57,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tag::class);
     }
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
     public function comments()
     {
         return $this->hasMany(Comment::class);
@@ -65,6 +69,7 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $url = 'http://localhost:8000/password/reset?token=' . $token;
-        $this->notify(new ResetPasswordNotification($url, $token));
+        $email = $this->email;
+        $this->notify(new ResetPasswordNotification($url, $token, $email));
     }
 }

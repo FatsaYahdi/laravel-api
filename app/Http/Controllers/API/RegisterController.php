@@ -16,7 +16,7 @@ class RegisterController extends Controller
         $request->validate([
             'name' => 'required|string|min:3|max:255',
             'email' => 'required|email|unique:users|max:255',
-            'password' => 'required|string|min:8'
+            'password' => 'required|string|min:8|confirmed',
         ],[
             // name
             'name.required' => 'Nama harus di isi.',
@@ -31,7 +31,8 @@ class RegisterController extends Controller
             // password
             'password.required' => 'Password Harus di isi.',
             'password.string' => 'Password Harus berupa string.',
-            'password.min' => 'Password Harus 8 karakter atau lebih'
+            'password.min' => 'Password Harus 8 karakter atau lebih',
+            'password.confirmed' => 'Password konfirmasi harus sama.',
         ]);
         try {
             $data = $request->all();

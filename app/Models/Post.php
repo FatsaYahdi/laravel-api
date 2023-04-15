@@ -16,6 +16,7 @@ class Post extends Model
         'content',
         'user_id',
         'image',
+        'pin',
     ];
     protected $hidden = [
         'created_at', 
@@ -45,6 +46,10 @@ class Post extends Model
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
+    }
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'post_categories');
     }
     public function likes()
     {

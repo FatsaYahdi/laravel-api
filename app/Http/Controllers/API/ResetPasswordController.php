@@ -74,7 +74,7 @@ class ResetPasswordController extends Controller
         } else if ($status == Password::INVALID_TOKEN) {
             return response()->json([
                 'status' => 'gagal',
-                'message' => 'Token reset password tidak valid atau kadaluarsa.'
+                'message' => 'Token tidak valid atau kadaluarsa.'
             ], 422);
         }
         return response()->json([

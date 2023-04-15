@@ -97,7 +97,7 @@ class TagController extends Controller
 
         return response()->json([
             'status' => 'sukses',
-            'message' => 'Post Berhasil Di Hapus.',
+            'message' => 'Tag Berhasil Di Hapus.',
         ]);
     }
     public function list() {

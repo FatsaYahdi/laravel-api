@@ -21,7 +21,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user:id,name')->with('tags:id,name')->paginate(9);
+        $posts = Post::with('user:id,name')->with('tags:id,name')->with('categories:id,name')->paginate(9);
+        $pinned = Post::where('pin', true)->with('tags:id,name')->get();
         $postsData = $posts->items();
         $nextPageUrl = $posts->nextPageUrl();
         $prevPageUrl = $posts->previousPageUrl();
@@ -29,7 +30,8 @@ class PostController extends Controller
         $response = [
             'status' => 'sukses',
             'message' => 'Menampilkan Semua Postingan',
-            'posts' => $postsData
+            'posts' => $postsData,
+            'pinned' => $pinned
         ];
 
         if (!is_null($nextPageUrl)) {
@@ -52,8 +54,9 @@ class PostController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|string|min:3|unique:posts,title',
-            'content' => 'required|string|max:255',
-            'image' => 'image|nullable'
+            'content' => 'required|string',
+            'image' => 'nullable|image',
+            'pin' => 'boolean'
         ],[
             'title.required' => 'Title harus di isi.',
             'title.string' => 'Title harus berupa string.',
@@ -62,7 +65,7 @@ class PostController extends Controller
 
             'content.required' => 'Content harus di isi.',
             'content.string' => 'Content harus berupa string.',
-            'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.'
+            'pin.boolean' => 'Kolom Pin harus true / false'
         ]);
         try {
             $data = $validatedData;
@@ -72,8 +75,10 @@ class PostController extends Controller
                 $data['image'] = $fileName;
             }
             $post = Post::create(array_merge($data, ['user_id' => auth()->user()->id]));
-            $tag = $request->input('tag_id');
+            $tag = $request->input('tag');
+            $category = $request->input('category');
             $post->tags()->attach($tag);
+            $post->categories()->attach($category);
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Post Berhasil Di Buat.',
@@ -101,14 +106,16 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $comments = Comment::where('post_id', $post->id)->with('user:id,name')->with('replies.user:id,name')->get();
-        $posts = Post::with('tags:id,name')->with('user:id,name')->find($post->id);
+        $posts = Post::with('tags:id,name')->with('categories:id,name')->with('user:id,name')->find($post->id);
+        $like = Like::where('post_id', $post->id)->count();
         $post->views++;
         $post->save();
         return response()->json([
             'status' => 'sukses',
             'message' => 'Showing Post',
             'post' => $posts,
-            'comment' => $comments
+            'like' => $like,
+            'comment' => $comments,
         ]);
     }
     
@@ -122,14 +129,15 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'title' => 'nullable|string|min:3',
             'content' => 'nullable|string|max:255',
-            'image' => 'nullable|image'
+            'image' => 'nullable',
+            'pin' => 'boolean',
         ],[
             'title.string' => 'Title harus berupa string.',
             'title.min' => 'Title harus lebih dari 3 karakter atau lebih.',
 
             'content.string' => 'Content harus berupa string.',
             'content.max' => 'Content terlalu panjang. Maksimal 255 karakter.',
-            'image.image' => 'Image harus berupa gambar'
+            'pin.boolean' => 'Pin Harus berisi true / false'
         ]);
         try {
             $posts = Post::findOrFail($post);
@@ -153,11 +161,14 @@ class PostController extends Controller
                 $validatedData['image'] = $posts->image;
             }
             $posts->image = $validatedData['image'] ?? $posts->image;
+            $posts->pin = $validatedData['pin'] ?? $posts->pin;
+            
+            $tag = $request->input('tag');
+            $posts->tags()->sync($tag);
+            $category = $request->input('category');
+            $posts->categories()->sync($category);
             $posts->update();
-
-            $tagId = $request->input('tag_id');
-            $posts->tags()->sync($tagId);
-
+            
             return response()->json([
                 'status' => 'sukses',
                 'message' => 'Post Berhasil Di Perbaharui.',

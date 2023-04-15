@@ -89,6 +89,18 @@ class BookmarkController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $bm = Bookmark::where('post_id', $id)->where('user_id', auth()->user()->id)->first();
+        try {
+            $bm->delete();
+            return response()->json([
+                'status' => 'sukses',
+                'message' => 'Berhasil di hapus dari bookmark'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'gagal',
+                'message' => $e
+            ]);
+        }
     }
 }

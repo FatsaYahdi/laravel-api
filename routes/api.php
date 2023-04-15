@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\LikeController;
 use Illuminate\Support\Facades\Route;
@@ -74,6 +75,7 @@ Route::prefix('v2')->group(function () {
     Route::controller(BookmarkController::class)->prefix('saved')->group(function () {
         Route::get('/','index')->middleware('auth:sanctum');
         Route::post('/{id}/save','store')->middleware('auth:sanctum');
+        Route::delete('/{id}/delete','destroy')->middleware('auth:sanctum');
     });
     // post tag
     Route::controller(PostController::class)->prefix('posts')->middleware('auth:sanctum')->group(function () {
@@ -82,6 +84,16 @@ Route::prefix('v2')->group(function () {
         Route::get('/{post}','show');
         Route::put('/{post}','update');
         Route::delete('/{post}','destroy');
+    });
+    // category
+    Route::controller(CategoryController::class)->prefix('category')->group(function () {
+        Route::get('/','index');
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/create','store');
+            Route::put('/{category}/edit','update');
+            Route::delete('/{category}','destroy');
+            Route::get('/list','list');
+        });
     });
     Route::get('/posts/tag/{id}',[PostController::class, 'taglist']);
     Route::get('/tags',[TagController::class, 'list'])->middleware('auth:sanctum');

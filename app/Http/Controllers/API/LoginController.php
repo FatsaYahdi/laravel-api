@@ -43,7 +43,7 @@ class LoginController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'gagal',
-                'message' => $e->getMessage(),
+                'messages' => $e->getMessage(),
             ], 401);
         }
     }
