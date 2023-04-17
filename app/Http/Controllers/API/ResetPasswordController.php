@@ -39,12 +39,13 @@ class ResetPasswordController extends Controller
         $validator = Validator::make($request->all(), [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|confirmed',
         ], [
             'token.required' => 'Token harus di isi.',
             'email.required' => 'Email harus di isi.',
             'email.email' => 'Email harus berupa valid email.',
-            'password.required' => 'Password harus di isi.'
+            'password.required' => 'Password harus di isi.',
+            'password.confirmed' => 'Password Konfirmasi tidak sama.',
         ]);
 
         if ($validator->fails()) {
